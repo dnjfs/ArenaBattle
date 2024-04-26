@@ -5,6 +5,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "ABAI.h"
 
 AABAIController::AABAIController()
 {
@@ -26,6 +27,8 @@ void AABAIController::RunAI()
 	UBlackboardComponent* BlackboardPtr = Blackboard.Get();
 	if (UseBlackboard(BBAsset, BlackboardPtr))
 	{
+		Blackboard->SetValueAsVector(BBKEY_HOMEPOS, GetPawn()->GetActorLocation());
+
 		bool RunResult = RunBehaviorTree(BTAsset);
 		ensure(RunResult);
 	}
