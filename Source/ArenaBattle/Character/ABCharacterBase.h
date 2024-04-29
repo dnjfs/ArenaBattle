@@ -7,6 +7,7 @@
 #include "Interface/ABAnimationAttackInterface.h"
 #include "Interface/ABCharacterWidgetInterface.h"
 #include "Interface/ABCharacterItemInterface.h"
+#include "GameData/ABCharacterStat.h"
 #include "ABCharacterBase.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogABCharacter, Log, All);
@@ -109,4 +110,5 @@ protected:
 public:
 	int32 GetLevel();
 	void SetLevel(int32 InNewLevel);
+	void ApplyStat(const FABCharacterStat& BaseStat, const FABCharacterStat& ModifierStat);
 };
