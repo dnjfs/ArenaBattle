@@ -3,6 +3,10 @@
 
 #include "Player/ABPlayerController.h"
 #include "UI/ABHUDWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "ABSaveGame.h"
+
+DEFINE_LOG_CATEGORY(LogABPlayerController);
 
 AABPlayerController::AABPlayerController()
 {
@@ -13,6 +17,28 @@ AABPlayerController::AABPlayerController()
 	}
 }
 
+void AABPlayerController::GameScoreChanged(int32 NewScore)
+{
+	K2_OnScoreChanged(NewScore);
+}
+
+void AABPlayerController::GameClear()
+{
+	K2_OnGameClear();
+}
+
+void AABPlayerController::GameOver()
+{
+	K2_OnGameOver();
+
+	if (!UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("Player0"), 0))
+	{
+		UE_LOG(LogABPlayerController, Error, TEXT("Save Game Error!"));
+	}
+
+	K2_OnGameRetryCount(SaveGameInstance->RetryCount);
+}
+
 void AABPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -20,9 +46,13 @@ void AABPlayerController::BeginPlay()
 	FInputModeGameOnly GameOnlyInputMode;
 	SetInputMode(GameOnlyInputMode);
 
-	ABHUDWidget = CreateWidget<UABHUDWidget>(this, ABHUDWidgetClass);
-	if (ABHUDWidget)
+	SaveGameInstance = Cast<UABSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("Player0"), 0));
+	if (!SaveGameInstance)
 	{
-		ABHUDWidget->AddToViewport();
+		SaveGameInstance = NewObject<UABSaveGame>();
+		SaveGameInstance->RetryCount = 0;
 	}
+	SaveGameInstance->RetryCount++;
+
+	K2_OnGameRetryCount(SaveGameInstance->RetryCount);
 }
